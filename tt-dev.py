@@ -20,6 +20,7 @@ from tt.actions.write import note
 
 from tt.actions.read import log
 from tt.actions.read import csv
+from tt.actions.read import day
 from tt.actions.read import report
 from tt.actions.read import calview
 from tt.actions.read import status
@@ -73,6 +74,10 @@ def parse_args(argv=sys.argv):
 
     elif head in ['csv']:
         fn = csv.action_csv
+        args = {}
+        
+    elif head in ['day']:
+        fn = day.action_day
         args = {}
 
     elif head in ['report']:
