@@ -13,7 +13,8 @@ class JsonStore(object):
                 data = json.load(f)
 
         else:
-            data = {'work': []}
+            data = {'work': [],
+                    'holiday': []}
 
         return data
 

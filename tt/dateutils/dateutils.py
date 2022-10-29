@@ -26,10 +26,15 @@ def isotime_utc_to_local(isotime_utc):
 def parse_isotime(isotime_str):
     return datetime.strptime(isotime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
 
+def parse_isodate(isodate_str):
+    return datetime.strptime(isodate_str, '%Y-%m-%dT')
+
 #   returns a datetime for an input string
 def to_datetime(timestr):
     return parse_time_h_m_to_iso(timestr).isoformat() + 'Z'
 
+def to_date(timestr):
+    return parse_time_h_m_to_iso(timestr).date().isoformat() + 'T'
 
 def local_to_utc(local_dt):
     local_dt_dst = get_local_timezone().localize(local_dt)
@@ -40,6 +45,11 @@ def local_to_utc(local_dt):
 def formatted_str_for_isotime_str(isotime_str, format_str):
     localtime = isotime_utc_to_local(isotime_str)
     return localtime.strftime(format_str)
+
+
+def formatted_str_for_isodate_str(isodate_str, format_str):
+    date = parse_isodate(isodate_str)
+    return date.strftime(format_str)
 
 
 def get_current_day():
