@@ -11,6 +11,8 @@ from tt.dataaccess.utils import get_data_store
 from tt.actions.utils import reportingutils
 def action_calview(colorizer, month, year):
     report = generate_day_based_report()
+    days_off = generate_days_off()
+    print(days_off)
     year =  get_current_year_local_tz() if year is None else year
 
     print('Displaying all entries for ', colorizer.yellow(year+'-'+month),  ' grouped by day:', sep='')
@@ -21,12 +23,19 @@ def action_calview(colorizer, month, year):
     # in case you like working on saturdays or sundays calview will determine if something was logged
     # if that's the case print the Weekend also in calview, else stay sane with Monday till Friday
     isSevenDayWeek = bool(False)
+    isDaysOff = [False for week in range(len(month_cal))]
     for week in range(len(month_cal)):
         weekdays = month_cal[week]
         activity_saturday = get_activity(report, 0, weekdays[5], year, month)
         activity_sunday = get_activity(report, 0, weekdays[6], year, month)
+        for day in weekdays:
+            day_off = get_day_off(days_off, day, year, month)
+            if day_off != "":
+                isDaysOff[week] = True
         if activity_saturday != "" or activity_sunday != "":
             isSevenDayWeek = bool(True)
+
+    print(isDaysOff)
 
     header = "|         " + colorizer.yellow("Monday") + "           |         " + colorizer.yellow(
         "Tuesday") + "          |         " + colorizer.yellow("Wednesday") + "        |         " + colorizer.yellow(
@@ -56,10 +65,21 @@ def action_calview(colorizer, month, year):
             print(colorizer.blue(day_cell_header.ljust(26, ' ')),  end="|")
         print()
         print(delimiter)
+        if isDaysOff[week]:
+            print_week_days_off(colorizer, weekdays[0:weekEnd], days_off, year, month)
         print_week_activity(colorizer, weekdays[0:weekEnd],  5,  report,  year,  month)
         #print("WEEK DONE")
         print(delimiter)
         
+def print_week_days_off(colorizer, current_week, days_off, year, month):
+    print("",  end="|")    
+    for day_index in range(len(current_week)):
+        if current_week[day_index] == 0:
+            print("".rjust(26, ' '),  end="|")
+        else:
+            day_off_str =  get_day_off(days_off,  current_week[day_index],  year,  month)
+            print(colorizer.red(day_off_str.rjust(26, ' ')),  end="|")
+    print("")
 
 def print_week_activity(colorizer, current_week,  height_in_rows,  report,  year,  month):
    for curr_row in range(height_in_rows):
@@ -86,6 +106,14 @@ def get_activity(report,  curr_row,  day_key,  year,  month):
             activity = activity_key + " : " + format_time(activity_duration) + " "
     finally:
         return activity
+    
+def get_day_off(days_off, day_key, year, month):
+    report_key=str(year)+"-"+month.zfill(2)+"-"+str(day_key).zfill(2)
+    day_off = ""
+    try:
+        day_off = days_off[report_key]
+    finally:
+        return day_off
 
 def generate_day_based_report():
     data = get_data_store().load()
@@ -102,6 +130,16 @@ def generate_day_based_report():
             report[day][item['name']] += duration
             #print ('report[', day,  "][", item['name'], "]=" ,  report[day][item['name']])
     return report
+
+def generate_days_off():
+    data = get_data_store().load()
+    holiday = data['holiday']
+    days_off = dict()
+    for item in holiday:
+        day = reportingutils.extract_day(item['date'] + '00:00:00.0Z')
+        days_off[day] = item['name']
+    return days_off
+            
 
 def format_time(duration_timedelta):
     return format_time_seconds(duration_timedelta.seconds)
