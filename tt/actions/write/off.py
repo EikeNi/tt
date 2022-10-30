@@ -2,13 +2,9 @@ from tt.exceptz.exceptz import AlreadyOn
 from tt.dataaccess.utils import get_data_store
 from tt.dateutils.dateutils import formatted_str_for_isodate_str
 
-def action_free(colorizer, name, time):
+def action_off(colorizer, name, time):
     data = get_data_store().load()
     holiday = data['holiday']
-
-    # if work and 'end' not in work[-1] and 'free' not in work[-1]:
-    #     raise AlreadyOn("You are already working on %s. Stop it or use a "
-    #                     "different sheet." % (colorizer.yellow(work[-1]['name']),))
 
     entry = {
         'name': name,

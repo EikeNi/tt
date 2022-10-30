@@ -39,6 +39,7 @@ coverage.xml
 
 .idea/
 venv/
+.venv/
 
 #eric project files
 .eric6project/

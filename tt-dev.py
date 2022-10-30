@@ -5,7 +5,7 @@ import sys
 
 from tt.colors.colors import Colorizer
 
-from tt.dateutils.dateutils import to_datetime
+from tt.dateutils.dateutils import to_datetime, to_date
 
 from tt.exceptz.exceptz import BadArguments
 from tt.exceptz.exceptz import TIError
@@ -17,6 +17,7 @@ from tt.actions.write import start
 from tt.actions.write import stop
 from tt.actions.write import tag
 from tt.actions.write import note
+from tt.actions.write import off
 
 from tt.actions.read import log
 from tt.actions.read import csv
@@ -24,6 +25,7 @@ from tt.actions.read import day
 from tt.actions.read import report
 from tt.actions.read import calview
 from tt.actions.read import status
+from tt.actions.read import summary
 
 
 def parse_args(argv=sys.argv):
@@ -64,6 +66,17 @@ def parse_args(argv=sys.argv):
         fn = stop.action_stop
         args = {'colorizer': colorizer, 'time': to_datetime(' '.join(tail))}
 
+    elif head in ['off']:
+        if not tail:
+            raise BadArguments(
+                'Please provide a reason for your day off.')
+        fn = off.action_off
+        args = {
+            'colorizer': colorizer,
+            'name': tail[0],
+            'time': to_date('now'),
+        }
+
     elif head in ['status']:
         fn = status.action_status
         args = {'colorizer': colorizer}
@@ -79,6 +92,12 @@ def parse_args(argv=sys.argv):
     elif head in ['day']:
         fn = day.action_day
         args = {}
+        
+    elif head in ['summary']:
+        fn = summary.action_summary
+        if not tail:
+            raise BadArguments('Please provide the month for which to generate the summary')
+        args = {'month': tail[0], 'year': tail[1] if len(tail) > 1 else None}
 
     elif head in ['report']:
         fn = report.action_report
