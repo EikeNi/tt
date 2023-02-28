@@ -15,6 +15,8 @@ def action_calview(colorizer, month, year):
     report = generate_day_based_report()
     days_off = generate_days_off()
     print(days_off)
+    days_off = generate_days_off()
+    print(days_off)
     year =  get_current_year_local_tz() if year is None else year
 
     print('Displaying all entries for ', colorizer.yellow(year+'-'+month),  ' grouped by day:', sep='')
@@ -71,10 +73,21 @@ def action_calview(colorizer, month, year):
         print(delimiter)
         if isDaysOff[week]:
             print_week_days_off(colorizer, weekdays[0:weekEnd], days_off, year, month)
+        if isDaysOff[week]:
+            print_week_days_off(colorizer, weekdays[0:weekEnd], days_off, year, month)
         print_week_activity(colorizer, weekdays[0:weekEnd],  5,  report,  year,  month)
         #print("WEEK DONE")
         print(delimiter)
 
+def print_week_days_off(colorizer, current_week, days_off, year, month):
+    print("",  end="|")    
+    for day_index in range(len(current_week)):
+        if current_week[day_index] == 0:
+            print("".rjust(26, ' '),  end="|")
+        else:
+            day_off_str =  get_day_off(days_off,  current_week[day_index],  year,  month)
+            print(colorizer.red(day_off_str.rjust(26, ' ')),  end="|")
+    print("")
 def print_week_days_off(colorizer, current_week, days_off, year, month):
     print("",  end="|")    
     for day_index in range(len(current_week)):
@@ -121,7 +134,15 @@ def get_activity(report,  curr_row,  day_key,  year,  month):
             activity = abbreviate_name(activity_key) + " : " + format_time(activity_duration) + " "
     finally:
         return activity
-    
+        
+def get_day_off(days_off, day_key, year, month):
+    report_key=str(year)+"-"+month.zfill(2)+"-"+str(day_key).zfill(2)
+    day_off = ""
+    try:
+        day_off = days_off[report_key]
+    finally:
+        return day_off
+
 def get_day_off(days_off, day_key, year, month):
     report_key=str(year)+"-"+month.zfill(2)+"-"+str(day_key).zfill(2)
     day_off = ""
@@ -161,6 +182,16 @@ def get_day_total_work_time(report, year, month, day_key):
     finally:
         return duration_as_str
 
+
+def generate_days_off():
+    data = get_data_store().load()
+    holiday = data['holiday']
+    days_off = dict()
+    for item in holiday:
+        day = reportingutils.extract_day(item['date'] + '00:00:00.0Z')
+        days_off[day] = item['name']
+    return days_off
+            
 
 def generate_days_off():
     data = get_data_store().load()
