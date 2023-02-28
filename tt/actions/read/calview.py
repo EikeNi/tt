@@ -14,9 +14,6 @@ from tt.actions.utils import reportingutils
 def action_calview(colorizer, month, year):
     report = generate_day_based_report()
     days_off = generate_days_off()
-    print(days_off)
-    days_off = generate_days_off()
-    print(days_off)
     year =  get_current_year_local_tz() if year is None else year
 
     print('Displaying all entries for ', colorizer.yellow(year+'-'+month),  ' grouped by day:', sep='')
@@ -38,8 +35,6 @@ def action_calview(colorizer, month, year):
                 isDaysOff[week] = True
         if activity_saturday != "" or activity_sunday != "":
             isSevenDayWeek = bool(True)
-
-    print(isDaysOff)
 
     header = "|         " + colorizer.yellow("Monday") + "           |         " + colorizer.yellow(
         "Tuesday") + "          |         " + colorizer.yellow("Wednesday") + "        |         " + colorizer.yellow(
@@ -71,8 +66,6 @@ def action_calview(colorizer, month, year):
             print(colorizer.blue(day_cell_header_iso_date) + colorizer.grey(day_cell_header_total_work),  end="|")
         print()
         print(delimiter)
-        if isDaysOff[week]:
-            print_week_days_off(colorizer, weekdays[0:weekEnd], days_off, year, month)
         if isDaysOff[week]:
             print_week_days_off(colorizer, weekdays[0:weekEnd], days_off, year, month)
         print_week_activity(colorizer, weekdays[0:weekEnd],  5,  report,  year,  month)
@@ -182,16 +175,6 @@ def get_day_total_work_time(report, year, month, day_key):
     finally:
         return duration_as_str
 
-
-def generate_days_off():
-    data = get_data_store().load()
-    holiday = data['holiday']
-    days_off = dict()
-    for item in holiday:
-        day = reportingutils.extract_day(item['date'] + '00:00:00.0Z')
-        days_off[day] = item['name']
-    return days_off
-            
 
 def generate_days_off():
     data = get_data_store().load()

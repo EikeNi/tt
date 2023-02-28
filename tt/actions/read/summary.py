@@ -8,7 +8,6 @@ import calendar
 
 
 def action_summary(month, year):
-    sep = "|"
     data = get_data_store().load()
     work = data["work"]
     days_off = generate_days_off()
@@ -33,7 +32,6 @@ def action_summary(month, year):
                 continue
             name = item["name"]
             duration = parse_isotime(item["end"]) - parse_isotime(item["start"])
-            # duration = duration - timedelta(seconds=duration.seconds)
             try:
                 report[name]
             except KeyError:
