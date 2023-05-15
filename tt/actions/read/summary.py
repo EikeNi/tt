@@ -18,12 +18,11 @@ def action_summary(month, year):
     target_working_time = timedelta()
     month_days = []
     for week in month_cal:
-        for day in week[0:5]:
+        for i, day in enumerate(week):
             report_key = str(year) + "-" + month.zfill(2) + "-" + str(day).zfill(2)
             month_days.append(report_key)
-            if day > 0 and report_key not in days_off.keys():
+            if day > 0 and i < 5 and report_key not in days_off.keys():
                 target_working_time += timedelta(hours=7, minutes=57, seconds=36)
-
     report = dict()
     for item in work:
         if "end" in item:

@@ -32,5 +32,5 @@ def action_day():
             report[day]['work_duration'] += duration
     sep = '|'
     for day in sorted(report.keys()):
-        print(day, ': ', reportingutils.remove_seconds(report[day]['start'].time()), sep, reportingutils.remove_seconds(report[day]['end'].time()), sep, reportingutils.remove_seconds((report[day]['end'] - report[day]['start']) - report[day]['work_duration']))
+        print(day, ': ', reportingutils.remove_seconds(report[day]['start'].time()), sep, reportingutils.remove_seconds(report[day]['end'].time()), sep, reportingutils.remove_seconds((report[day]['end'] - report[day]['start']) - report[day]['work_duration']), sep, reportingutils.remove_seconds(report[day]['work_duration']))
     
