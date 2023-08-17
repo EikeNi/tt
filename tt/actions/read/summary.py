@@ -16,13 +16,17 @@ def action_summary(month, year):
     month_cal = calendar.monthcalendar(int(year), int(month))
 
     target_working_time = timedelta()
+    days_off_time = timedelta()
     month_days = []
     for week in month_cal:
         for i, day in enumerate(week):
             report_key = str(year) + "-" + month.zfill(2) + "-" + str(day).zfill(2)
             month_days.append(report_key)
-            if day > 0 and i < 5 and report_key not in days_off.keys():
-                target_working_time += timedelta(hours=7, minutes=57, seconds=36)
+            if day > 0 and i < 5:
+                if report_key not in days_off.keys():
+                    target_working_time += timedelta(hours=7, minutes=57, seconds=36)
+                elif days_off[report_key] != "Feiertag":
+                    days_off_time += timedelta(hours=7, minutes=57, seconds=36)
     report = dict()
     for item in work:
         if "end" in item:
@@ -46,10 +50,23 @@ def action_summary(month, year):
         report[name]["rate"] = round(
             100 * report[name]["work_duration"] / target_working_time, 1
         )
+    total_rate = sum([entry["rate"] for entry in report.values()])
+    for name in sorted(report.keys()):
+        # adjust the rate to cover days off
+        report[name]["adjusted_rate"] = round(
+            100
+            * (
+                report[name]["work_duration"]
+                + (days_off_time * report[name]["rate"] / total_rate)
+            )
+            / (target_working_time + days_off_time),
+            1,
+        )
+    for name in sorted(report.keys()):
         print(
             name.ljust(fill),
             ": ",
-            "%5.1f" % report[name]["rate"],
+            "%5.1f" % report[name]["adjusted_rate"],
             " - TAGS:",
             sorted(list(set(report[name]["tags"]))),
         )
@@ -57,7 +74,7 @@ def action_summary(month, year):
     print(
         "Total".ljust(fill),
         ": ",
-        "%5.1f" % sum([entry["rate"] for entry in report.values()]),
+        "%5.1f" % sum([entry["adjusted_rate"] for entry in report.values()]),
     )
 
 
