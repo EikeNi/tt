@@ -34,6 +34,11 @@ def parse_isodate(isodate_str):
     return datetime.strptime(isodate_str, "%Y-%m-%dT")
 
 
+def parse_date_string(datestr):
+    date_obj = datetime.strptime(datestr, "%Y-%m-%d")
+    return date_obj.strftime("%Y-%m-%dT")
+
+
 #   returns a datetime for an input string
 def to_datetime(timestr):
     return parse_time_h_m_to_iso(timestr).isoformat() + "Z"
