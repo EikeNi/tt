@@ -13,6 +13,7 @@ from tt.exceptz.exceptz import TIError
 from tt.actions.utils import help
 
 from tt.actions.write import edit
+from tt.actions.write import ect
 from tt.actions.write import start
 from tt.actions.write import stop
 from tt.actions.write import tag
@@ -83,7 +84,10 @@ def parse_args(argv=sys.argv):
 
     elif head in ['log']:
         fn = log.action_log
-        args = {'period': tail[0] if tail else None}
+        if len(tail) > 2:
+            raise BadArguments(
+                'Please provide no more than 2 arguments to log (start and end datetime in ISO8601 format)')
+        args = {'period': tail}
 
     elif head in ['csv']:
         fn = csv.action_csv
@@ -101,9 +105,7 @@ def parse_args(argv=sys.argv):
 
     elif head in ['report']:
         fn = report.action_report
-        if not tail:
-            raise BadArguments('Please provide the name of the activity for which to generate the report')
-        args = {'colorizer': colorizer, 'activity': tail[0]}
+        args = {'colorizer': colorizer, 'activity': tail[0] if tail else None}
         
     elif head in ['calview']:
         fn = calview.action_calview
@@ -125,6 +127,10 @@ def parse_args(argv=sys.argv):
 
         fn = note.action_note
         args = {'colorizer': colorizer, 'content': ' '.join(tail)}
+
+    elif head in ['edit-current-timebox', 'ect']:
+        fn = ect.action_edit_current_timebox
+        args = {}
 
     else:
         raise BadArguments("I don't understand %r" % (head,))

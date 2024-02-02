@@ -34,6 +34,15 @@ def print_help():
           '      tt note \'The quick brown fox humps the lazy bear\'')
 
     print()
+    print('  ect | edit-current-timebox\n'
+          '    Description:\n'
+          '      Edits the notes of the current timebox in an editor of your choosing, yaml formatted. \n'
+          '      For information on how to set the editor, please refer to the help entry of the <<edit>> command\n'
+          '    Examples:\n'
+          '      tt ect\n'
+          '      tt edit-current-timebox')
+
+    print()
     print('  tag [TAG0] [TAG1] [TAG2]\n'
           '    Description:\n'
           '      Adds a list of tags to an open work package\n'
@@ -58,7 +67,7 @@ def print_help():
           '      editors such as LibreOffice Sheets. The separator is the pipe symbol.\n'
           '    Examples:\n'
           '      tt csv\n'
-          '      tt csv --nocolor > /tmp/allentries.csv ; libreoffice /tmp/allentries.csv')
+          '      tt csv --no-color > /tmp/allentries.csv ; libreoffice /tmp/allentries.csv')
 
     print()
     print('  status \n'
@@ -67,18 +76,30 @@ def print_help():
           '      be found. \n'
           '    Examples:\n'
           '      tt status\n'
-          '      tt status --nocolor')
+          '      tt status --no-color')
     print()
     print('  report [WORK_PACKAGE] \n'
           '    Description:\n'
           '      Creates an aggregated daily report for the work package you specify as parameter. It creates one\n'
           '      aggregated entry per day, based on the entire database content. If you need to restrict the report\n'
           '      to certain periods, such as a specific month, feel free to pipe the output through grep or other\n'
-          '      cli tools. \n'
+          '      cli tools. If no work package is specified, all activities will be reported.\n'
+          '      By default, the report assumes you work 8 hours per day. You can change this by setting the\n'
+          '      environment variable TT_HOURS_PER_DAY to the number of hours you work per day.\n'
           '    Examples:\n'
+          '      tt report\n'
           '      tt report cleaning\n'
-          '      tt report cleaning --nocolor\n'
-          '      tt report cleaning --nocolor | grep 2019-03 ')
+          '      tt report cleaning --no-color\n'
+          '      tt report cleaning --no-color | grep 2019-03 ')
+    print()
+    print('  log [START_DATETIME] [END_DATETIME] \n'
+          '    Description:\n'
+          '      Prints a log of the total time spent on each activity, optionally filtered by activities started\n'
+          '      within a given time period\n'
+          '    Examples:\n'
+          '      tt log\n'
+          '      tt log 2023-11-13\n'
+          '      tt log 2023-11-13 2023-11-15T13:00:00')
     print()
     print('  calview [MONTH] [YEAR] \n'
           '    Description:\n'
@@ -86,7 +107,7 @@ def print_help():
           '      The [YEAR] parameter is optional; if omitted, it defaults to the current year. \n'
           '    Examples:\n'
           '      tt calview 12\n'
-          '      tt calview 11 --nocolor\n'
+          '      tt calview 11 --no-color\n'
           '      tt calview 10 2030')
     print()
     print('For the full documentation, check out http://github.com/dribnif/tt')

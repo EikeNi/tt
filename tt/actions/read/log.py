@@ -6,14 +6,19 @@ from tt.dateutils.dateutils import *
 from tt.colors.colors import *
 
 
-def action_log(period):
+def action_log(period=[]):
     data = get_data_store().load()
     work = data['work']
     log = defaultdict(lambda: {'delta': timedelta()})
     current = None
-
+    period = [datetime.fromisoformat(dt) for dt in period]
     for item in work:
         start_time = parse_isotime(item['start'])
+
+        if len(period) > 0 and start_time < period[0]:
+            continue
+        if len(period) > 1 and start_time > period[1]:
+            continue
 
         if 'end' in item:
             log[item['name']]['delta'] += (
@@ -43,7 +48,6 @@ def action_log(period):
         if secs:
             tmsg.append(str(secs) + ' second' + ('s' if secs > 1 else ''))
 
-        print(tmsg)
         log[name]['tmsg'] = ', '.join(tmsg)[::-1].replace(',', '& ', 1)[::-1]
 
     for name, item in sorted(log.items(), key=(lambda x: x[0]), reverse=True):

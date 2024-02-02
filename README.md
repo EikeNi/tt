@@ -130,6 +130,12 @@ exists, i.e. if the `stop` command hasn't been invoked yet:
 
     $ tt note "implement new user authentication"
 
+In order to reduce boilerplate text when adding loads of notes to your timebox,
+tt also allows you to edit the notes of your current timebox only. Do this with the command **ect** or
+**edit-current-timebox**, which will launch the editor you've selected (see next chapter on how to do that):
+
+    $ tt ect
+
 Tag your activity for added reportability:
 
     $ tt tag private
@@ -154,10 +160,15 @@ See your entries:
 
 ### log
 
-Get a log of all activities with the `log` (or `l`) command:
+Get a log of the total time spent on each activity:
 
     $ tt log
 
+Get a log of the total time spent on each activity, filtered by activities started within a given time period:
+
+    $ tt log 2023-11-13 2023-11-15T13:00:00
+
+Accepts datetimes in ISO8601 format. End datetime not required.
 ### csv
 
 Get a list of all your individual log entries in CSV format, so that they can be imported
