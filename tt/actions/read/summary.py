@@ -6,6 +6,13 @@ from tt.actions.utils import reportingutils
 
 import calendar
 
+TT_HOURS_PER_DAY = float(os.getenv("TT_HOURS_PER_DAY", 8))
+hours_per_day = timedelta(
+    hours=int(TT_HOURS_PER_DAY),
+    minutes=int(round(TT_HOURS_PER_DAY % 1, 2) * 60),
+    seconds=int(round((round(TT_HOURS_PER_DAY % 1, 2) * 60) % 1, 2) * 60),
+)
+
 
 def action_summary(month, year):
     data = get_data_store().load()
@@ -24,9 +31,7 @@ def action_summary(month, year):
             month_days.append(report_key)
             if day > 0 and i < 5:
                 if report_key not in days_off.keys():
-                    target_working_time += timedelta(hours=7, minutes=57, seconds=36)
-                elif days_off[report_key] != "Feiertag":
-                    days_off_time += timedelta(hours=7, minutes=57, seconds=36)
+                    target_working_time += hours_per_day
     report = dict()
     for item in work:
         if "end" in item:
@@ -54,19 +59,14 @@ def action_summary(month, year):
     for name in sorted(report.keys()):
         # adjust the rate to cover days off
         report[name]["adjusted_rate"] = round(
-            100
-            * (
-                report[name]["work_duration"]
-                + (days_off_time * report[name]["rate"] / total_rate)
-            )
-            / (target_working_time + days_off_time),
-            1,
+            100 * (report[name]["work_duration"]) / target_working_time,
+            2,
         )
     for name in sorted(report.keys()):
         print(
             name.ljust(fill),
             ": ",
-            "%5.1f" % report[name]["adjusted_rate"],
+            "%5.2f" % report[name]["adjusted_rate"],
             " - TAGS:",
             sorted(list(set(report[name]["tags"]))),
         )
@@ -74,7 +74,7 @@ def action_summary(month, year):
     print(
         "Total".ljust(fill),
         ": ",
-        "%5.1f" % sum([entry["adjusted_rate"] for entry in report.values()]),
+        "%5.2f" % sum([entry["adjusted_rate"] for entry in report.values()]),
     )
 
 
@@ -83,8 +83,6 @@ def generate_days_off():
     holiday = data["holiday"]
     days_off = dict()
     for item in holiday:
-        if item["name"] == "ZA":
-            continue
         day = reportingutils.extract_day(item["date"] + "00:00:00.0Z")
         days_off[day] = item["name"]
     return days_off
