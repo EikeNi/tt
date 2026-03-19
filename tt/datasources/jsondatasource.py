@@ -14,7 +14,8 @@ class JsonStore(object):
 
         else:
             data = {'work': [],
-                    'holiday': []}
+                    'holiday': [],
+                    'task_categories': {}}
 
         return data
 

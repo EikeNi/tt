@@ -113,11 +113,25 @@ def parse_args(argv=sys.argv):
 
     elif head in ["summary"]:
         fn = summary.action_summary
-        if not tail:
+
+        include_categories = False
+        filtered_tail = []
+        for arg in tail:
+            if arg in ["--with-categories", "--categories"]:
+                include_categories = True
+            else:
+                filtered_tail.append(arg)
+
+        if len(filtered_tail) > 2:
             raise BadArguments(
-                "Please provide the month for which to generate the summary"
+                "Please provide no more than 2 positional arguments to summary (month and optional year)"
             )
-        args = {"month": tail[0], "year": tail[1] if len(tail) > 1 else None}
+        args = {
+            "month": filtered_tail[0] if filtered_tail else None,
+            "year": filtered_tail[1] if len(filtered_tail) > 1 else None,
+            "colorizer": colorizer,
+            "include_categories": include_categories,
+        }
 
     elif head in ["report"]:
         fn = report.action_report

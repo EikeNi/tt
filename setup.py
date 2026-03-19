@@ -35,7 +35,7 @@ setup(
             "tt = tt.tt:main",
         ]
     },
-    install_requires=["colorama", "pyyaml", 'tzlocal==2.1', 'pytz', 'mock'],
+    install_requires=["colorama", "pyyaml", 'tzlocal==2.1', 'pytz', 'mock', 'asciichartpy'],
     setup_requires=["pytest-runner"] if testing else [],
     tests_require=["pytest", "cram", "pytest-cram"],
     extras_require={

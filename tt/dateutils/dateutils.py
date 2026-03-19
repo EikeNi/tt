@@ -92,6 +92,12 @@ def get_current_year_local_tz():
     return now_local_dt.strftime("%Y")
 
 
+def get_current_month_local_tz():
+    now = datetime.utcnow()
+    now_local_dt = utc_to_local(now)
+    return now_local_dt.strftime("%m")
+
+
 def parse_time_h_m_to_iso(timestr):
     now = get_now()
 

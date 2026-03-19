@@ -110,4 +110,16 @@ def print_help():
           '      tt calview 11 --no-color\n'
           '      tt calview 10 2030')
     print()
+    print('  summary [MONTH] [YEAR] [--with-categories] \n'
+          '    Description:\n'
+          '      Prints a monthly activity share summary and an ASCII utilization chart for the last 12 months.\n'
+          '      Use --with-categories (or --categories) to include stacked category lines in the chart.\n'
+          '      If [MONTH] is omitted, it defaults to the current local month. [YEAR] is optional.\n'
+          '    Examples:\n'
+          '      tt summary\n'
+          '      tt summary 03\n'
+          '      tt summary 03 2026\n'
+          '      tt summary --with-categories\n'
+          '      tt summary 03 2026 --categories')
+    print()
     print('For the full documentation, check out http://github.com/dribnif/tt')
