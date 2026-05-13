@@ -19,6 +19,7 @@ from tt.actions.write import stop
 from tt.actions.write import tag
 from tt.actions.write import note
 from tt.actions.write import off
+from tt.actions.write import push
 
 from tt.actions.read import log
 from tt.actions.read import csv
@@ -166,6 +167,10 @@ def parse_args(argv=sys.argv):
     elif head in ["edit-current-timebox", "ect"]:
         fn = ect.action_edit_current_timebox
         args = {}
+
+    elif head in ["push"]:
+        fn = push.action_push
+        args = {"colorizer": colorizer, "xlsx_path": tail[0] if tail else None}
 
     else:
         raise BadArguments("I don't understand %r" % (head,))
