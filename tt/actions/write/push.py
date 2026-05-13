@@ -71,10 +71,10 @@ def action_push(colorizer, xlsx_path):
     wb = openpyxl.load_workbook(xlsx_path)
     ws = wb.active
 
-    work_filled = 0
-    work_skipped = 0
-    off_filled = 0
-    off_skipped = 0
+    work_new = 0
+    work_updated = 0
+    off_new = 0
+    off_updated = 0
 
     for row in ws.iter_rows(min_row=2):
         cell_date = row[0].value
@@ -86,49 +86,57 @@ def action_push(colorizer, xlsx_path):
             cell_start = row[5]   # column F
             cell_end = row[6]     # column G
             cell_break = row[7]   # column H
-            if cell_start.value is not None:
-                work_skipped += 1
+            was_empty = cell_start.value is None
+
+            entry = day_report[day_key]
+            break_duration = (entry["end"] - entry["start"]) - entry["work_duration"]
+            start_t = entry["start"].time().replace(second=0, microsecond=0)
+            end_t = entry["end"].time().replace(second=0, microsecond=0)
+            break_t = _timedelta_to_time(break_duration)
+            cell_start.value = start_t
+            cell_end.value = end_t
+            cell_break.value = break_t
+
+            suffix = "" if was_empty else colorizer.yellow("  [updated]")
+            if was_empty:
+                work_new += 1
             else:
-                entry = day_report[day_key]
-                break_duration = (entry["end"] - entry["start"]) - entry["work_duration"]
-                start_t = entry["start"].time().replace(second=0, microsecond=0)
-                end_t = entry["end"].time().replace(second=0, microsecond=0)
-                break_t = _timedelta_to_time(break_duration)
-                cell_start.value = start_t
-                cell_end.value = end_t
-                cell_break.value = break_t
-                work_filled += 1
-                print(
-                    colorizer.green(day_key) + "  work  "
-                    + start_t.strftime("%H:%M") + " - " + end_t.strftime("%H:%M")
-                    + "  break " + break_t.strftime("%H:%M")
-                )
+                work_updated += 1
+            print(
+                colorizer.green(day_key) + "  work  "
+                + start_t.strftime("%H:%M") + " - " + end_t.strftime("%H:%M")
+                + "  break " + break_t.strftime("%H:%M")
+                + suffix
+            )
 
         if day_key in days_off:
             cell_comment = row[11]  # column L
-            if cell_comment.value is not None:
-                off_skipped += 1
+            was_empty = cell_comment.value is None
+
+            cell_comment.value = days_off[day_key]
+            row[4].value = 0  # column E: Soll = 0 for days off
+
+            suffix = "" if was_empty else colorizer.yellow("  [updated]")
+            if was_empty:
+                off_new += 1
             else:
-                cell_comment.value = days_off[day_key]
-                row[4].value = 0  # column E: Soll = 0 for days off
-                off_filled += 1
-                print(colorizer.yellow(day_key) + "  off   " + days_off[day_key])
+                off_updated += 1
+            print(colorizer.yellow(day_key) + "  off   " + days_off[day_key] + suffix)
 
     wb.save(xlsx_path)
 
-    if work_filled == 0 and work_skipped == 0 and off_filled == 0 and off_skipped == 0:
+    if work_new == 0 and work_updated == 0 and off_new == 0 and off_updated == 0:
         print("No matching days found in %s." % xlsx_path)
         return
 
     print("")
-    parts = []
-    parts.append("Pushed " + colorizer.green(str(work_filled)) + " work day(s) and "
-                 + colorizer.green(str(off_filled)) + " day(s) off to " + xlsx_path + ".")
-    skipped_parts = []
-    if work_skipped:
-        skipped_parts.append(colorizer.yellow(str(work_skipped)) + " work day(s)")
-    if off_skipped:
-        skipped_parts.append(colorizer.yellow(str(off_skipped)) + " day(s) off")
-    if skipped_parts:
-        parts.append("Skipped " + " and ".join(skipped_parts) + " already filled.")
-    print(" ".join(parts))
+    work_summary = colorizer.green(str(work_new)) + " new"
+    if work_updated:
+        work_summary += ", " + colorizer.yellow(str(work_updated)) + " updated"
+    off_summary = colorizer.green(str(off_new)) + " new"
+    if off_updated:
+        off_summary += ", " + colorizer.yellow(str(off_updated)) + " updated"
+    print(
+        "Pushed to " + xlsx_path + ":  "
+        + "work " + work_summary + "  |  off " + off_summary
+    )

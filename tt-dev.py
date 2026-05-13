@@ -28,6 +28,7 @@ from tt.actions.read import report
 from tt.actions.read import calview
 from tt.actions.read import status
 from tt.actions.read import summary
+from tt.actions.read import balance
 
 
 def parse_args(argv=sys.argv):
@@ -167,6 +168,10 @@ def parse_args(argv=sys.argv):
     elif head in ["edit-current-timebox", "ect"]:
         fn = ect.action_edit_current_timebox
         args = {}
+
+    elif head in ["balance"]:
+        fn = balance.action_balance
+        args = {"colorizer": colorizer}
 
     elif head in ["push"]:
         fn = push.action_push
