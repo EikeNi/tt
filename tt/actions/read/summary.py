@@ -192,6 +192,7 @@ def render_last_12_month_total_plot(rows, colorizer=None, include_categories=Fal
         ]
 
     total_series = [max(0.0, row["rate"]) for row in rows]
+    mean_rate = sum(total_series) / len(total_series) if total_series else 0.0
 
     terminal_cols, terminal_rows = get_terminal_size()
     chart_height = max(MINI_PLOT_HEIGHT, min(18, terminal_rows - 8))
@@ -201,6 +202,7 @@ def render_last_12_month_total_plot(rows, colorizer=None, include_categories=Fal
     expanded_total_series = []
     for value in total_series:
         expanded_total_series.extend([value] * repeat_per_month)
+    expanded_mean_series = [mean_rate] * len(expanded_total_series)
 
     scale_max = max([100.0] + total_series)
 
@@ -211,10 +213,10 @@ def render_last_12_month_total_plot(rows, colorizer=None, include_categories=Fal
         "format": "{:6.1f}",
     }
 
-    series = [expanded_total_series]
-    lines = ["  Total"]
+    series = [expanded_total_series, expanded_mean_series]
+    lines = ["  Total  (mean: %.1f%%)" % mean_rate]
     if should_use_chart_colors(colorizer):
-        config["colors"] = [asciichart.red]
+        config["colors"] = [asciichart.red, asciichart.blue]
 
     plot_lines = asciichart.plot(series, config).splitlines()
     lines.extend(plot_lines)
@@ -228,6 +230,7 @@ def render_last_12_month_total_plot(rows, colorizer=None, include_categories=Fal
 
 def render_last_12_month_stacked_area_plot(rows, colorizer=None):
     total_series = [max(0.0, row["rate"]) for row in rows]
+    mean_rate = sum(total_series) / len(total_series) if total_series else 0.0
     category_series = {
         category_name: [max(0.0, row["category_rates"][category_name]) for row in rows]
         for category_name in CATEGORY_CHOICES
@@ -270,7 +273,12 @@ def render_last_12_month_stacked_area_plot(rows, colorizer=None):
                 canvas[y][x] = category_symbols[category_name]
             bottom = top
 
-    lines = ["  Stacked categories (total is top edge)"]
+    mean_y = int(round((mean_rate / scale_max) * chart_height))
+    for x in range(plot_width):
+        if canvas[mean_y][x] == " ":
+            canvas[mean_y][x] = "-"
+
+    lines = ["  Stacked categories (total is top edge, mean: %.1f%%)" % mean_rate]
     lines.append(get_stacked_plot_legend_line(colorizer))
 
     axis_column = 8

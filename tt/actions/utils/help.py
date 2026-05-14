@@ -1,4 +1,33 @@
 
+def print_brief_help():
+    print('tt - command-line time tracker')
+    print()
+    print('Commands:')
+    commands = [
+        ('start',   'Open a new work package'),
+        ('stop',    'Close the current work package'),
+        ('status',  'Show the current open work package'),
+        ('note',    'Add a note to the current work package'),
+        ('tag',     'Add tags to the current work package'),
+        ('off',     'Record a day off or holiday'),
+        ('day',     'Per-day overview: clock-in, clock-out, break, worked'),
+        ('log',     'Total time per activity, optionally filtered by date range'),
+        ('report',  'Aggregated daily report per work package'),
+        ('calview', 'Monthly calendar view with daily durations'),
+        ('summary', 'Monthly utilization summary with 12-month ASCII chart'),
+        ('balance', 'Weekly hours saldo since a start date'),
+        ('csv',     'Export all entries as pipe-separated CSV'),
+        ('edit',    'Open the time entry database in $EDITOR'),
+        ('ect',     'Edit current timebox notes in $EDITOR'),
+        ('push',    'Write times to an xlsx timesheet file'),
+    ]
+    width = max(len(cmd) for cmd, _ in commands)
+    for cmd, desc in commands:
+        print('  %-*s  %s' % (width, cmd, desc))
+    print()
+    print("Run 'tt help' for full documentation.")
+
+
 def print_help():
     print('tt is a simple command-line time tracking tool.')
     print()
@@ -109,6 +138,41 @@ def print_help():
           '      tt calview 12\n'
           '      tt calview 11 --no-color\n'
           '      tt calview 10 2030')
+    print()
+    print('  off [NAME] [DATE | START_DATE END_DATE]\n'
+          '    Description:\n'
+          '      Records a day off (holiday, sick day, etc.) into the database. Accepts a single date\n'
+          '      or a range of dates. Days off are excluded from target working time in summary and balance.\n'
+          '    Examples:\n'
+          '      tt off vacation 2026-12-24\n'
+          '      tt off vacation 2026-12-24 2026-12-31')
+    print()
+    print('  day \n'
+          '    Description:\n'
+          '      Prints a per-day overview of first clock-in, last clock-out, break time, and total worked time.\n'
+          '    Examples:\n'
+          '      tt day\n'
+          '      tt day --no-color')
+    print()
+    print('  balance \n'
+          '    Description:\n'
+          '      Shows a weekly hours saldo table since a start date, accumulating over- and under-time.\n'
+          '      Requires the environment variable TT_SALDO_START_DATE (YYYY-MM-DD).\n'
+          '      Optionally set TT_SALDO_START_HOURS to a decimal initial saldo (e.g. 12.5 or -3).\n'
+          '      Respects TT_HOURS_PER_DAY and days recorded with tt off.\n'
+          '    Examples:\n'
+          '      TT_SALDO_START_DATE=2026-01-01 tt balance\n'
+          '      TT_SALDO_START_DATE=2026-01-01 TT_SALDO_START_HOURS=-5 tt balance')
+    print()
+    print('  push [XLSX_PATH]\n'
+          '    Description:\n'
+          '      Writes daily start, end, and break times into an xlsx timesheet file (column F/G/H).\n'
+          '      Days off are written to column L and set the Soll column (E) to 0.\n'
+          '      Requires openpyxl: pip install openpyxl --break-system-packages\n'
+          '      The xlsx path can also be set via TT_XLSX_FILE.\n'
+          '    Examples:\n'
+          '      tt push ~/timesheet.xlsx\n'
+          '      TT_XLSX_FILE=~/timesheet.xlsx tt push')
     print()
     print('  summary [MONTH] [YEAR] [--with-categories] \n'
           '    Description:\n'

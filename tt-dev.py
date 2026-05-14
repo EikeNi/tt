@@ -40,7 +40,8 @@ def parse_args(argv=sys.argv):
 
     # prog = argv[0]
     if len(argv) == 1:
-        raise BadArguments("You must specify a command.")
+        help.print_brief_help()
+        sys.exit(0)
 
     head = argv[1]
     tail = argv[2:]
